@@ -39,7 +39,7 @@ export function createApi(store = new TaskStore()) {
         }
         const tasks = store.list();
         return json(response, 200, {
-          tasks: completed === null ? tasks : tasks.filter(task => task.completed === Boolean(completed)),
+          tasks: completed === null ? tasks : tasks.filter(task => task.completed === (completed === 'true')),
         });
       }
 
