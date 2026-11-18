@@ -35,6 +35,36 @@ test('invalid titles return a client error and leave the list empty', async t =>
   assert.deepEqual(await (await api('/tasks')).json(), { tasks: [] });
 });
 
+test('creating a task emits one event naming the event and the task', async t => {
+  const api = await startApi(t);
+  const lines: string[] = [];
+  t.mock.method(console, 'info', (line: string) => lines.push(line));
+
+  const task = await (await api('/tasks', 'POST', { title: '  Book meeting room  ' })).json();
+
+  assert.equal(lines.length, 1);
+  assert.deepEqual(JSON.parse(lines[0]), { event: 'task.created', taskId: task.id });
+  assert.ok(!lines[0].includes('Book meeting room'), 'the task title must not reach the log');
+});
+
+test('a rejected title emits no event', async t => {
+  const api = await startApi(t);
+  const lines: string[] = [];
+  t.mock.method(console, 'info', (line: string) => lines.push(line));
+
+  assert.equal((await api('/tasks', 'POST', { title: '   ' })).status, 400);
+  assert.equal(lines.length, 0);
+});
+
+test('a failing log sink does not fail task creation', async t => {
+  const api = await startApi(t);
+  t.mock.method(console, 'info', () => {
+    throw new Error('EPIPE');
+  });
+
+  assert.equal((await api('/tasks', 'POST', { title: 'Survive a broken log pipe' })).status, 201);
+});
+
 test('completion updates validate the value and task ID', async t => {
   const api = await startApi(t);
   assert.equal((await api('/tasks/missing', 'PATCH', { completed: true })).status, 404);
