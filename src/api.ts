@@ -47,7 +47,7 @@ export function createApi(store = new TaskStore()) {
       if (request.method === 'GET' && url.pathname === '/stats') {
         const tasks = store.list();
         const completed = tasks.filter(task => task.completed).length;
-        const percentComplete = tasks.length ? Math.round(completed / tasks.length) * 100 : 0;
+        const percentComplete = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
         return json(response, 200, { total: tasks.length, completed, percentComplete });
       }
 
