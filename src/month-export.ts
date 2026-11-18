@@ -11,7 +11,7 @@ export function exportMonth(tasks: Task[], month: string) {
   const until = end.getTime();
   return tasks.filter(task => {
     const created = Date.parse(task.createdAt);
-    return created >= from && created <= until;
+    return created >= from && created < until;
   });
 }
 
