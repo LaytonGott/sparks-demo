@@ -22,7 +22,9 @@ export class TaskStore {
   }
 
   list(): Task[] {
-    return [...this.tasks.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return [...this.tasks.values()].sort((a, b) =>
+      b.createdAt.localeCompare(a.createdAt) || a.title.localeCompare(b.title, 'en')
+    );
   }
 
   setCompleted(id: string, completed: boolean): Task | undefined {
