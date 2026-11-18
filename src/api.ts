@@ -33,7 +33,14 @@ export function createApi(store = new TaskStore()) {
     try {
       const url = new URL(request.url ?? '/', 'http://localhost');
       if (url.pathname === '/tasks' && request.method === 'GET') {
-        return json(response, 200, { tasks: store.list() });
+        const completed = url.searchParams.get('completed');
+        if (completed !== null && completed !== 'true' && completed !== 'false') {
+          throw new InputError('Use true or false for completed');
+        }
+        const tasks = store.list();
+        return json(response, 200, {
+          tasks: completed === null ? tasks : tasks.filter(task => task.completed === Boolean(completed)),
+        });
       }
 
       if (url.pathname === '/tasks' && request.method === 'POST') {
