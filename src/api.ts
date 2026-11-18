@@ -78,6 +78,10 @@ export function createApi(store = new TaskStore()) {
         const task = store.setCompleted(match[1], completed);
         if (task) return json(response, 200, task);
       }
+      if (match && request.method === 'GET') {
+        const task = store.get(match[1]);
+        if (task) return json(response, 200, task);
+      }
       return json(response, 404, { error: 'Not found' });
     } catch (error) {
       if (error instanceof InputError) return json(response, 400, { error: error.message });

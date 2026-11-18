@@ -10,6 +10,7 @@ With Node.js 24 or later installed, run `npm ci` and `npm start`. The server lis
 | --- | --- | --- |
 | POST | `/tasks` | Send `{"title":"Book meeting room"}` to create a task. Returns the task with status 201. |
 | GET | `/tasks` | Returns an object with a `tasks` array. |
+| GET | `/tasks/:id` | Returns one task, in the same shape as a list entry. Returns 404 when no task has that ID. |
 | GET | `/healthz` | Returns `{"status":"ok"}`. Does not touch the task list. |
 | PATCH | `/tasks/:id` | Send `{"completed":true}` to complete a task or `{"completed":false}` to reopen it. Returns the updated task. |
 
