@@ -44,6 +44,13 @@ export function createApi(store = new TaskStore()) {
         return json(response, 201, store.create(title.trim()));
       }
 
+      if (request.method === 'GET' && url.pathname === '/stats') {
+        const tasks = store.list();
+        const completed = tasks.filter(task => task.completed).length;
+        const percentComplete = tasks.length ? Math.round(completed / tasks.length) * 100 : 0;
+        return json(response, 200, { total: tasks.length, completed, percentComplete });
+      }
+
       const match = /^\/tasks\/([^/]+)$/.exec(url.pathname);
       if (match && request.method === 'PATCH') {
         const { completed } = await readObject(request);
