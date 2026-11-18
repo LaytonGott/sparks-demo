@@ -32,6 +32,9 @@ export function createApi(store = new TaskStore()) {
   return createServer(async (request, response) => {
     try {
       const url = new URL(request.url ?? '/', 'http://localhost');
+      if (url.pathname === '/healthz' && request.method === 'GET') {
+        return json(response, 200, { status: 'ok' });
+      }
       if (url.pathname === '/tasks' && request.method === 'GET') {
         const completed = url.searchParams.get('completed');
         if (completed !== null && completed !== 'true' && completed !== 'false') {
