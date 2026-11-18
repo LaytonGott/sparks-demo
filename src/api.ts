@@ -28,12 +28,30 @@ function json(response: ServerResponse, status: number, body: unknown) {
   response.end(JSON.stringify(body));
 }
 
+function emitEvent(event: Record<string, unknown>) {
+  try {
+    console.info(JSON.stringify(event));
+  } catch {
+    // A broken log sink must not fail the request that produced the event.
+  }
+}
+
 export function createApi(store = new TaskStore()) {
   return createServer(async (request, response) => {
     try {
       const url = new URL(request.url ?? '/', 'http://localhost');
+      if (url.pathname === '/healthz' && request.method === 'GET') {
+        return json(response, 200, { status: 'ok' });
+      }
       if (url.pathname === '/tasks' && request.method === 'GET') {
-        return json(response, 200, { tasks: store.list() });
+        const completed = url.searchParams.get('completed');
+        if (completed !== null && completed !== 'true' && completed !== 'false') {
+          throw new InputError('Use true or false for completed');
+        }
+        const tasks = store.list();
+        return json(response, 200, {
+          tasks: completed === null ? tasks : tasks.filter(task => task.completed === (completed === 'true')),
+        });
       }
 
       if (url.pathname === '/tasks' && request.method === 'POST') {
@@ -41,7 +59,9 @@ export function createApi(store = new TaskStore()) {
         if (typeof title !== 'string' || !title.trim() || title.trim().length > 200) {
           throw new InputError('Title must contain 1 to 200 characters');
         }
-        return json(response, 201, store.create(title.trim()));
+        const task = store.create(title.trim());
+        emitEvent({ event: 'task.created', taskId: task.id });
+        return json(response, 201, task);
       }
 
       if (request.method === 'GET' && url.pathname === '/stats') {
