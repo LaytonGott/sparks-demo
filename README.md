@@ -10,10 +10,15 @@ With Node.js 24 or later installed, run `npm ci` and `npm start`. The server lis
 | --- | --- | --- |
 | POST | `/tasks` | Send `{"title":"Book meeting room"}` to create a task. Returns the task with status 201. |
 | GET | `/tasks` | Returns an object with a `tasks` array. |
+| GET | `/healthz` | Returns `{"status":"ok"}`. Does not touch the task list. |
 | PATCH | `/tasks/:id` | Send `{"completed":true}` to complete a task or `{"completed":false}` to reopen it. Returns the updated task. |
 
 Each task has an ID, a title, a completion flag and an ISO creation timestamp. Titles accept up to 200 characters after trimming whitespace.
 
+Use `GET /tasks?completed=true` for completed tasks or `GET /tasks?completed=false` for open tasks. Omit the parameter to list all tasks.
+
 ## Development
+
+Use `npm run dev` to restart the local API automatically when its source changes.
 
 Run `npm run check` for the TypeScript check and `npm test` for the HTTP and store tests. GitHub Actions runs both checks on pull requests and pushes to main.
