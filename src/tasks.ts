@@ -22,9 +22,10 @@ export class TaskStore {
   }
 
   list(): Task[] {
-    return [...this.tasks.values()].sort((a, b) =>
-      b.createdAt.localeCompare(a.createdAt) || a.title.localeCompare(b.title, 'en')
-    );
+    return [...this.tasks.values()].sort((a, b) => {
+      if (a.completed !== b.completed) return a.completed ? 1 : -1;
+      return b.createdAt.localeCompare(a.createdAt) || a.title.localeCompare(b.title, 'en');
+    });
   }
 
   setCompleted(id: string, completed: boolean): Task | undefined {
