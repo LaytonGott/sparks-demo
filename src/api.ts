@@ -41,7 +41,9 @@ export function createApi(store = new TaskStore()) {
         if (typeof title !== 'string' || !title.trim() || title.trim().length > 200) {
           throw new InputError('Title must contain 1 to 200 characters');
         }
-        return json(response, 201, store.create(title.trim()));
+        const task = store.create(title.trim());
+        console.info(JSON.stringify({ event: 'task.created', taskId: task.id, title: task.title }));
+        return json(response, 201, task);
       }
 
       const match = /^\/tasks\/([^/]+)$/.exec(url.pathname);
