@@ -15,6 +15,10 @@ export class TaskStore {
     this.now = now;
   }
 
+  get(id: string): Task | undefined {
+    return this.tasks.get(id);
+  }
+
   create(title: string): Task {
     const task = { id: randomUUID(), title, completed: false, createdAt: this.now().toISOString() };
     this.tasks.set(task.id, task);
