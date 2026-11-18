@@ -16,4 +16,6 @@ Each task has an ID, a title, a completion flag and an ISO creation timestamp. T
 
 ## Development
 
+Use `npm run dev` to restart the local API automatically when its source changes.
+
 Run `npm run check` for the TypeScript check and `npm test` for the HTTP and store tests. GitHub Actions runs both checks on pull requests and pushes to main.
