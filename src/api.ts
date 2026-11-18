@@ -28,6 +28,14 @@ function json(response: ServerResponse, status: number, body: unknown) {
   response.end(JSON.stringify(body));
 }
 
+function emitEvent(event: Record<string, unknown>) {
+  try {
+    console.info(JSON.stringify(event));
+  } catch {
+    // A broken log sink must not fail the request that produced the event.
+  }
+}
+
 export function createApi(store = new TaskStore()) {
   return createServer(async (request, response) => {
     try {
@@ -51,7 +59,9 @@ export function createApi(store = new TaskStore()) {
         if (typeof title !== 'string' || !title.trim() || title.trim().length > 200) {
           throw new InputError('Title must contain 1 to 200 characters');
         }
-        return json(response, 201, store.create(title.trim()));
+        const task = store.create(title.trim());
+        emitEvent({ event: 'task.created', taskId: task.id });
+        return json(response, 201, task);
       }
 
       const match = /^\/tasks\/([^/]+)$/.exec(url.pathname);
